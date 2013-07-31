@@ -28,6 +28,7 @@ posicion_bolita = posicion_inicial
 
 vector_inicial = (10,10)
 vector_bolita = vector_inicial
+factor_aumento = 1.5
 
 distancia_paleta_I = 50
 distancia_paleta_D = 730
@@ -47,6 +48,9 @@ estado_I = ESTADO_ESPERANDO
 estado_D = ESTADO_ESPERANDO
 texto_visible = True
 ganador_visible = False
+
+en_movimiento_I = False
+en_movimiento_D = False
 
 # otras
 texto_ganador = ""
@@ -73,20 +77,26 @@ while (estado_juego == JUEGO_CORRIENDO):
     # leyendo el teclado
     estados_teclas = pygame.key.get_pressed()
 
+    en_movimiento_I = False
     if (estados_teclas[pygame.K_LSHIFT] and (posicion_paleta_I > limite_superior)):
         posicion_paleta_I -= 10
+        en_movimiento_I = True
         
     if (estados_teclas[pygame.K_LCTRL] and (posicion_paleta_I < (limite_inferior - tamano_paleta[1]))):
         posicion_paleta_I += 10
+        en_movimiento_I = True        
 
     if (estados_teclas[pygame.K_TAB]):
         estado_I = ESTADO_LISTO
 
+    en_movimiento_D = False
     if (estados_teclas[pygame.K_UP] and (posicion_paleta_D > limite_superior)):
         posicion_paleta_D -= 10
+        en_movimiento_D = True
         
     if (estados_teclas[pygame.K_DOWN] and (posicion_paleta_D < (limite_inferior - tamano_paleta[1]))):
         posicion_paleta_D += 10
+        en_movimiento_D = True
 
     if estados_teclas[pygame.K_BACKSPACE]:
         estado_D = ESTADO_LISTO
@@ -108,7 +118,13 @@ while (estado_juego == JUEGO_CORRIENDO):
          and (posicion_bolita[1] < (posicion_paleta_I + tamano_paleta[1])))
         or (((posicion_bolita[0] + tamano_bolita[0]) > distancia_paleta_D)
             and ((posicion_bolita[1] + tamano_bolita[1]) > posicion_paleta_D)
-            and (posicion_bolita[1] < (posicion_paleta_D + tamano_paleta[1])))):           
+            and (posicion_bolita[1] < (posicion_paleta_D + tamano_paleta[1])))):
+        if (((posicion_bolita[0] < (distancia_paleta_I + tamano_paleta[0]))
+            and (en_movimiento_I))
+            or (((posicion_bolita[0] + tamano_bolita[0]) > distancia_paleta_D)
+                and (en_movimiento_D))):
+            vector_bolita = (int(vector_bolita[0] * factor_aumento), vector_bolita[1])
+            
         vector_bolita = (-vector_bolita[0], vector_bolita[1])
         posicion_bolita = (posicion_bolita[0] + vector_bolita[0], posicion_bolita[1])
 
