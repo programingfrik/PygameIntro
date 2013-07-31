@@ -6,6 +6,7 @@ import pygame
 import math
 
 pygame.init()
+pygame.mixer.init()
 
 
 # los colores del juego
@@ -65,6 +66,11 @@ pygame.display.set_caption("Turbo Pong!")
 reloj = pygame.time.Clock()
 letras_puntaje = pygame.font.SysFont("default", 50)
 
+sonido_A = pygame.mixer.Sound("fist.ogg")
+sonido_B = pygame.mixer.Sound("club.ogg")
+pygame.mixer.music.load("speeditup.ogg")
+pygame.mixer.music.play(-1)
+
 inicio_cont = 15
 cont = inicio_cont
 
@@ -112,6 +118,7 @@ while (estado_juego == JUEGO_CORRIENDO):
         or (posicion_bolita[1] > (limite_inferior - tamano_bolita[1]))):
         vector_bolita = (vector_bolita[0],-vector_bolita[1])
         posicion_bolita = (posicion_bolita[0], posicion_bolita[1] + vector_bolita[1])
+        sonido_A.play()
         
     if (((posicion_bolita[0] < (distancia_paleta_I + tamano_paleta[0]))
          and ((posicion_bolita[1] + tamano_bolita[1]) > posicion_paleta_I)
@@ -127,6 +134,7 @@ while (estado_juego == JUEGO_CORRIENDO):
             
         vector_bolita = (-vector_bolita[0], vector_bolita[1])
         posicion_bolita = (posicion_bolita[0] + vector_bolita[0], posicion_bolita[1])
+        sonido_B.play()
 
     if ((posicion_bolita[0] > distancia_paleta_D) or ((posicion_bolita[0] + tamano_bolita[0]) < distancia_paleta_I)):
         if (posicion_bolita[0] > distancia_paleta_D):
@@ -192,4 +200,5 @@ while (estado_juego == JUEGO_CORRIENDO):
     pygame.display.flip()
     reloj.tick(30)
 
+pygame.mixer.quit()
 pygame.display.quit()
