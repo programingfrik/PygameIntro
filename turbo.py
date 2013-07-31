@@ -12,6 +12,7 @@ pygame.init()
 color_fondo = (0,0,0)
 color_paleta = (255, 255, 255)
 color_bolita = (255, 255, 255)
+color_puntaje = (255, 255, 255)
 color_limite = (255, 255, 255)
 
 # tamanos coordenadas
@@ -39,12 +40,29 @@ JUEGO_CERRANDO = 1
 
 estado_juego = JUEGO_CORRIENDO
 
+ESTADO_ESPERANDO = 0
+ESTADO_LISTO = 1
+
+estado_I = ESTADO_ESPERANDO
+estado_D = ESTADO_ESPERANDO
+texto_visible = True
+ganador_visible = False
+
 # otras
+texto_ganador = ""
+
+puntaje_I = 0
+puntaje_D = 0
+maximo_puntaje = 5
 
 pantalla = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Turbo Pong!")
 
 reloj = pygame.time.Clock()
+letras_puntaje = pygame.font.SysFont("default", 50)
+
+inicio_cont = 15
+cont = inicio_cont
 
 while (estado_juego == JUEGO_CORRIENDO):
 
@@ -61,17 +79,24 @@ while (estado_juego == JUEGO_CORRIENDO):
     if (estados_teclas[pygame.K_LCTRL] and (posicion_paleta_I < (limite_inferior - tamano_paleta[1]))):
         posicion_paleta_I += 10
 
+    if (estados_teclas[pygame.K_TAB]):
+        estado_I = ESTADO_LISTO
+
     if (estados_teclas[pygame.K_UP] and (posicion_paleta_D > limite_superior)):
         posicion_paleta_D -= 10
         
     if (estados_teclas[pygame.K_DOWN] and (posicion_paleta_D < (limite_inferior - tamano_paleta[1]))):
         posicion_paleta_D += 10
 
+    if estados_teclas[pygame.K_BACKSPACE]:
+        estado_D = ESTADO_LISTO
+
     if estados_teclas[pygame.K_ESCAPE]:
         estado_juego = JUEGO_CERRANDO
     
     # reaccionando
-    posicion_bolita = (posicion_bolita[0] + vector_bolita[0], posicion_bolita[1] + vector_bolita[1])
+    if ((estado_I == ESTADO_LISTO) and (estado_D == ESTADO_LISTO)):
+        posicion_bolita = (posicion_bolita[0] + vector_bolita[0], posicion_bolita[1] + vector_bolita[1])
     
     if ((posicion_bolita[1] < limite_superior)
         or (posicion_bolita[1] > (limite_inferior - tamano_bolita[1]))):
@@ -88,10 +113,31 @@ while (estado_juego == JUEGO_CORRIENDO):
         posicion_bolita = (posicion_bolita[0] + vector_bolita[0], posicion_bolita[1])
 
     if ((posicion_bolita[0] > distancia_paleta_D) or ((posicion_bolita[0] + tamano_bolita[0]) < distancia_paleta_I)):
+        if (posicion_bolita[0] > distancia_paleta_D):
+            puntaje_I += 1
+            vector_inicial = (math.fabs(vector_inicial[0]), vector_inicial[1])
+        elif ((posicion_bolita[0] + tamano_bolita[0]) < distancia_paleta_I):
+            puntaje_D += 1
+            vector_inicial = (-math.fabs(vector_inicial[0]), vector_inicial[1])
+
+        vector_bolita = vector_inicial
         posicion_bolita = posicion_inicial
         posicion_paleta_I = posicion_paleta_inicial
         posicion_paleta_D = posicion_paleta_inicial
-    
+        estado_I = ESTADO_ESPERANDO
+        estado_D = ESTADO_ESPERANDO
+        ganador_visible = False
+            
+        if ((puntaje_I >= maximo_puntaje) or (puntaje_D >= maximo_puntaje)):
+            if (puntaje_I >= maximo_puntaje):
+                texto_ganador = "<- GANO"
+            elif (puntaje_D >= maximo_puntaje):
+                texto_ganador = "GANO ->"
+                
+            ganador_visible = True
+            puntaje_I = 0
+            puntaje_D = 0
+            
     # la parte de dibujadera
     pantalla.fill(color_fondo)
 
@@ -104,7 +150,29 @@ while (estado_juego == JUEGO_CORRIENDO):
     pygame.draw.rect(pantalla, color_paleta, pygame.Rect(distancia_paleta_D, posicion_paleta_D, tamano_paleta[0], tamano_paleta[1]))
 
     pygame.draw.rect(pantalla, color_bolita, pygame.Rect(posicion_bolita, tamano_bolita))
+
+    img_temp = letras_puntaje.render(str(puntaje_I), False, color_puntaje)
+    pantalla.blit(img_temp, (80,5))
+
+    img_temp = letras_puntaje.render(str(puntaje_D), False, color_puntaje)
+    pantalla.blit(img_temp, (700,5))
+
+    img_temp = letras_puntaje.render("TURBO PONG", False, color_puntaje)
+    pantalla.blit(img_temp, (290,5))
+
+    cont -= 1
+    if (cont <= 0):
+        cont = inicio_cont
+        texto_visible = not texto_visible
+    
+    if (((estado_I == ESTADO_ESPERANDO) or (estado_D == ESTADO_ESPERANDO)) and (texto_visible)):
+        img_temp = letras_puntaje.render("PRESIONA START", False, color_puntaje)
+        pantalla.blit(img_temp, (250, 200))
         
+        if (ganador_visible):
+            img_temp = letras_puntaje.render(texto_ganador, False, color_puntaje)
+            pantalla.blit(img_temp, (330, 400))
+    
     pygame.display.flip()
     reloj.tick(30)
 
