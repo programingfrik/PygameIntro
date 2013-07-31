@@ -60,6 +60,12 @@ puntaje_I = 0
 puntaje_D = 0
 maximo_puntaje = 5
 
+PUNTAJE_I = 0
+PUNTAJE_D = 1
+quien_seguido = 0
+puntaje_seguido = 3
+cont_seguido = 0
+
 pantalla = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Turbo Pong!")
 
@@ -68,12 +74,17 @@ letras_puntaje = pygame.font.SysFont("default", 50)
 
 sonido_A = pygame.mixer.Sound("fist.ogg")
 sonido_B = pygame.mixer.Sound("club.ogg")
+sonido_toasty = pygame.mixer.Sound("toasty.ogg")
 pygame.mixer.music.load("speeditup.ogg")
 pygame.mixer.music.play(-1)
+
+pablo_toasty = pygame.image.load("pablo_toasty.png")
 
 inicio_cont = 15
 cont = inicio_cont
 
+inicio_toasty = 30
+toasty_cont = 0
 while (estado_juego == JUEGO_CORRIENDO):
 
     for event in pygame.event.get():
@@ -109,6 +120,11 @@ while (estado_juego == JUEGO_CORRIENDO):
 
     if estados_teclas[pygame.K_ESCAPE]:
         estado_juego = JUEGO_CERRANDO
+
+    if (estados_teclas[pygame.K_6] and (toasty_cont == 0)):
+        sonido_toasty.play()
+        toasty_cont = inicio_toasty
+        vector_bolita = (int(vector_bolita[0] * 3), vector_bolita[1])
     
     # reaccionando
     if ((estado_I == ESTADO_LISTO) and (estado_D == ESTADO_LISTO)):
@@ -140,9 +156,17 @@ while (estado_juego == JUEGO_CORRIENDO):
         if (posicion_bolita[0] > distancia_paleta_D):
             puntaje_I += 1
             vector_inicial = (math.fabs(vector_inicial[0]), vector_inicial[1])
+            if (quien_seguido == PUNTAJE_D):
+                quien_seguido = PUNTAJE_I
+                cont_seguido = 0
+            cont_seguido += 1
         elif ((posicion_bolita[0] + tamano_bolita[0]) < distancia_paleta_I):
             puntaje_D += 1
             vector_inicial = (-math.fabs(vector_inicial[0]), vector_inicial[1])
+            if (quien_seguido == PUNTAJE_I):
+                quien_seguido = PUNTAJE_D
+                cont_seguido = 0
+            cont_seguido += 1
 
         vector_bolita = vector_inicial
         posicion_bolita = posicion_inicial
@@ -151,6 +175,11 @@ while (estado_juego == JUEGO_CORRIENDO):
         estado_I = ESTADO_ESPERANDO
         estado_D = ESTADO_ESPERANDO
         ganador_visible = False
+
+        if (cont_seguido == puntaje_seguido):
+            cont_seguido = 0
+            sonido_toasty.play()
+            toasty_cont = inicio_toasty
             
         if ((puntaje_I >= maximo_puntaje) or (puntaje_D >= maximo_puntaje)):
             if (puntaje_I >= maximo_puntaje):
@@ -161,6 +190,7 @@ while (estado_juego == JUEGO_CORRIENDO):
             ganador_visible = True
             puntaje_I = 0
             puntaje_D = 0
+            cont_seguido = 0
             
     # la parte de dibujadera
     pantalla.fill(color_fondo)
@@ -196,6 +226,10 @@ while (estado_juego == JUEGO_CORRIENDO):
         if (ganador_visible):
             img_temp = letras_puntaje.render(texto_ganador, False, color_puntaje)
             pantalla.blit(img_temp, (330, 400))
+
+    if (toasty_cont > 0):
+        pantalla.blit(pablo_toasty, (656 + (math.fabs(toasty_cont - (inicio_toasty / 2)) * 10), 300))
+        toasty_cont -= 1
     
     pygame.display.flip()
     reloj.tick(30)
