@@ -12,6 +12,7 @@ pygame.init()
 color_fondo = (0,0,0)
 color_paleta = (255, 255, 255)
 color_bolita = (255, 255, 255)
+color_limite = (255, 255, 255)
 
 # tamanos coordenadas
 tamano_paleta = (20, 120)
@@ -85,9 +86,18 @@ while (estado_juego == JUEGO_CORRIENDO):
             and (posicion_bolita[1] < (posicion_paleta_D + tamano_paleta[1])))):           
         vector_bolita = (-vector_bolita[0], vector_bolita[1])
         posicion_bolita = (posicion_bolita[0] + vector_bolita[0], posicion_bolita[1])
+
+    if ((posicion_bolita[0] > distancia_paleta_D) or ((posicion_bolita[0] + tamano_bolita[0]) < distancia_paleta_I)):
+        posicion_bolita = posicion_inicial
+        posicion_paleta_I = posicion_paleta_inicial
+        posicion_paleta_D = posicion_paleta_inicial
     
     # la parte de dibujadera
     pantalla.fill(color_fondo)
+
+    pygame.draw.rect(pantalla, color_limite, pygame.Rect(distancia_paleta_I, (limite_superior - 10), (distancia_paleta_D - distancia_paleta_I + tamano_paleta[0]), 5))
+
+    pygame.draw.rect(pantalla, color_limite, pygame.Rect(distancia_paleta_I, (limite_inferior + 5), (distancia_paleta_D - distancia_paleta_I + tamano_paleta[0]), 5))
 
     pygame.draw.rect(pantalla, color_paleta, pygame.Rect(distancia_paleta_I, posicion_paleta_I, tamano_paleta[0], tamano_paleta[1]))
 
