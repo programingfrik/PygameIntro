@@ -1,0 +1,54 @@
+
+Clon de Turbo Pong sobre Pygame
+
+Este es un pequeño tutorial para construir un clon de turbo pong usando las facilidades de pygame. El objetivo no es mostrar todas las características de pygame ni hacer el juego más eficiente o confiable, si no el más simple de entender. Esta versión del juego está elaborada para dos jugadores también para evitar el trabajo de crear una inteligencia artificial que sería interesante pero que complicaría un poco más el ejemplo.
+
+turbo1.py
+
+La primera versión del juego y la más simple de todas. Lo que inicialmente se necesita para que el juego corra. Esta versión se puede comparar fácilmente con el ejemplo de la pelota del tutorial de introducción a pygame (http://www.pygame.org/docs/tut/intro/intro.html).
+
+Hay que recordar cuando estemos viendo el código fuente que los ejes de coordenadas no funcionan igual que como estamos acostumbrados. En pygame igual que en algunas otras librerías de gráficos el eje Y está invertido y la esquina superior izquierda de la pantalla es el origen del eje de coordenadas (0,0). Así que el eje Y aumenta hacia abajo y el X permanece igual asía la derecha.
+
+El objeto "pantalla" es un "Surface" de pygame donde vamos a dibujar los objetos de nuestro juego, como podemos ver se obtiene cuando le pedimos a pygame que inicialice la pantalla en un modo especial en el que queramos trabajar. Los objetos surface no ofrecen funciones de dibujo por sí mismos, pero los vamos a pasar como parámetro a las funciones de "pygame.draw" que se van a encargar de dibujar figuras, polígonos, lineas, etc sobre ellos. El objeto "reloj" se va a encargar de llevar el tiempo por nosotros para saber cuando se debe actualizar la pantalla.
+
+El programa se puede dividir en dos partes las inicializaciones y el ciclo principal de juego. Las inicializaciones se encargan de poner todo donde debería estar al inicio del juego. El ciclo principal es el corazón del juego. Cada vuelta del ciclo principal es un cuadro de animación. Sabemos que para que los humanos percibamos movimiento en las animaciones estas deben mostrarnos por lo menos 25 cuadros por segundo, menos 25 va a ser percibido como imágenes separadas, en este ejemplo usamos 30 cuadros por segundo para asegurar la calidad de la animación. Pygame nos brinda una forma simple de controlar la cantidad de cuadros por segundos que crea nuestro pequeño juego y es a través de la función Reloj.tick(cantidad_de_cuadros). Esta función se va a encargar de poner nuestro programa en pausa la cantidad de tiempo que se necesita para cumplir con la "cantidad_de_cuadros" que le solicitamos.
+
+Dentro del ciclo principal el proceso es siempre el mismo para cada cuadro de animación, se leen y procesan los eventos, se lee el estado del teclado y se ponen los valores que les corresponden a las variables que llevan las coordenadas de las paletas o que reaccionan con el teclado, se modifican los valores de las variables de acuerdo con lo que haya ocurrido y por último se dibuja todo en la pantalla para que se refleje lo que ha ocurrido.
+
+La función "flip" (voltear en español) se encarga de poner todo lo que dibujamos en la pantalla. Cuando dibujamos y componemos la pantalla de nuestro juego lo hacemos en memoria para así evitar que el usuario perciba un cuadro incompleto de la animación del juego en forma de parpadeos de la pantalla. En ese momento el programa se pausa unas fracciones de segundo para que el ojo del usuario perciba el nuevo cuadro de animación y vuelve y se repite todo el proceso.
+
+turbo2.py
+
+Ahora agregamos una condición nueva al programa para que en caso de que la "bolita" toque uno de los extremos de la pantalla se vuelva a poner la bolita en la posición inicial.
+
+Además en esta versión agregamos dos lineas para que sean visibles los extremos del juego. Estas dos lineas son estáticas.
+
+turbo3.py
+
+Para que sea un juego completo debe llevar la puntuación de los jugadores por eso ahora vamos a guardar la puntuación de lo jugadores y a mostrarla en un pequeño espacio que dejamos sobre el limite superior de la pantalla. Ya que vamos a detectar la puntuación podemos poner un limite de puntos para que cuando uno de los dos jugadores lo toque podamos elegirlo como ganador.
+
+Otra cosa que queremos controlar en esta versión es que al inicio de una partida se le de a los jugadores la oportunidad de ponerse listos, por eso la bolita está inicialmente detenida esperando que los estados de ambos jugadores sea "ESTADO_LISTO".
+
+También queremos que el texto, para alertar a los participantes de que deben estar listos o de un ganador, parpadee para que llame la atención. Así que creamos un contador que va a contar algunos cuadros para mostrar u ocultar estos textos. Además el nombre del juego está puesto en el tope de la pantalla de forma fija.
+
+turbo4.py
+
+Hasta ahora el juego está bien pero para hacerlo más interesante hay que darle algo a los jugadores para que pongan en uso sus habilidades. Así que de ahora en adelante cuando un jugador golpee la bolita mientras esté en movimiento esta va a aumentar su velocidad (la cantidad de pixeles que recorre en cada cuadro). Para lograr esto creamos otra variable que me guarde la información de si en el momento el jugador está en movimiento o no (en la variable en_movimiento_I/D). En el momento de detectar la colisión nos fijamos si el jugador con el que se produjo la colición está en movimiento o no.
+
+turbo5.py
+
+Hay una cosa fundamental que debería tener cualquier juego por más simple que sea y son música y sonidos interesantes. Así que le vamos a poner a nuestro juego un par de efectos de sonido robados del poderoso "Battle for Wesnoth" y una musiquita de "Xmoto" para nuestra versión mejorada de Turbo Pong.
+
+Hay que recordar inicializar el mixer con antelación y mandarlo a cerrar cuando nuestro programa deje de usarlo. Después solo tenemos que cargar los sonidos y reproducirlos en los momentos en que se produzca una colisión. La música se trata de forma especial en pygame y por eso en vez de crear un objeto de sonido como los otros se carga con "pygame.mixer.music.load('musica')" y se reproduce con "pygame.mixer.musica.play(-1)" que significa que la música se va a reproducir infinitamente.
+
+turbo.py
+
+Por último para hacer las cosas aún más interesantes podemos agregarle alguna cosa que lo haga diferente de los juegos de este género, podemos agregarle un sujeto que diga "toasty" cuando pase algo chevere como en Mortal Kombat, y ese sujeto puedo ser yo!. Armados con el sonido de Mortal Kombat y con una imagen de mi mismo ponemos otro contador para que de los pasos para introducir y sacar la imagen de la pantalla. De ahora en adelante cuando alguién haga 3 puntos seguidos yo voy a sacar mi cara para burlarme del tipo que esté perdiendo :P.
+
+Para mover la imagen nos aprovechamos de la función de valor absoluto de python "math.fabs(numero)" y de un contador en reversa. Con esta función cuando restamos la mitad del contador y sacando el valor absoluto obtendremos un contador que primero disminuye hasta 0 y luego vuelve a aumentar hasta llegar a su valor inicial donde se detiene. Usamos este contador especial para mover la imagen primero hacia dentro de la pantalla y luego afuera.
+
+conclusión
+
+Lo más importante aquí es darnos cuenta que pygame se está encargando de mucho trabajo por nosotros. En este pequeño ejemplo pygame está interactuando por nosotros con el sistema operativo, con el sistema de ventanas, con la tarjeta de sonido dejándonos apenas las decisiones más absolutamente necesarías. Creo que pygame con las facilidades que ofrece puede ser muy bien aprovechada por los programadores más jóvenes para hacer prototipos de juegos y programas de multimedia. Espero que este ejemplo les resulte interesante y que traten de hacer sus propios jueguillos.
+
+Saludos!
